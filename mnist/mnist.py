@@ -100,7 +100,6 @@ h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 """
 Dropout
-
 h_fc1 -> h_fc1_drop, 训练中启用，测试中关闭
 """
 keep_prob = tf.placeholder("float")
