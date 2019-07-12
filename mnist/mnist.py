@@ -45,8 +45,8 @@ def max_pool_2x2(x):
     # strides(pool滑动大小)   : A list of ints that has length >= 4. The stride of the sliding window for each dimension of the input tensor.
 
 
-start = time.clock() #计算开始时间
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True) #MNIST数据输入
+start = time.clock() #计算开始时间MNIST_data/
+mnist = input_data.read_data_sets("../MNIST_data/", one_hot=True) #MNIST数据输入
 
 """
 第一层 卷积层

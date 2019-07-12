@@ -2,7 +2,7 @@
 
 """
 File         :      mnist1.py
-Description  :  
+Description  :      tf实战3.2
 Author       :      赵金朋
 Modify Time  :      2019/7/2 11:21
 """
@@ -14,7 +14,7 @@ Modify Time  :      2019/7/2 11:21
 """
 #加载数据集
 from tensorflow.examples.tutorials.mnist import  input_data
-mnist=input_data.read_data_sets("MNIST_data/",one_hot=True)
+mnist=input_data.read_data_sets("../MNIST_data/",one_hot=True)
 #输出大小
 print(mnist.train.images.shape,mnist.train.labels.shape)
 print(mnist.test.images.shape,mnist.test.labels.shape)
