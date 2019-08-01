@@ -2,7 +2,7 @@
 
 """
 File         :      DAE1.py
-Description  :  
+Description  :  TF4.2自编码器
 Author       :      赵金朋
 Modify Time  :      2019/7/12 10:23
 """
@@ -32,7 +32,7 @@ Xavier初始化器的特点是会根据某一层网络的输入、输出节点�
 class AdditiveGaussianNoiseAutoencoder(object):
     #构建函数init()
     '''
-    init函数这样几个输入：
+    init函数包含这样几个输入：
     n_input（输入变量数）
     n_hidden（隐含层节点数）
     transfer_function（隐含层激活函数，默认为softplus）
