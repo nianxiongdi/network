@@ -67,31 +67,31 @@ def mpool_op(input_op, name, kh, kw, dh, dw):
 def inference_op(input_op, keep_prob):
     #初始化参数列表
     p = []
-    # assume input_op shape is 224x224x3
+    # 输入 224x224x3
 
-    # block 1 -- outputs 112x112x64
+    # block 1 -- 224*224*64--224*224*64-outputs 112x112x64
     conv1_1 = conv_op(input_op, name="conv1_1", kh=3, kw=3, n_out=64, dh=1, dw=1, p=p)
     conv1_2 = conv_op(conv1_1,  name="conv1_2", kh=3, kw=3, n_out=64, dh=1, dw=1, p=p)
     pool1 = mpool_op(conv1_2,   name="pool1",   kh=2, kw=2, dw=2, dh=2)
 
-    # block 2 -- outputs 56x56x128
+    # block 2 --112*112*128-112*112*128- outputs 56x56x128
     conv2_1 = conv_op(pool1,    name="conv2_1", kh=3, kw=3, n_out=128, dh=1, dw=1, p=p)
     conv2_2 = conv_op(conv2_1,  name="conv2_2", kh=3, kw=3, n_out=128, dh=1, dw=1, p=p)
     pool2 = mpool_op(conv2_2,   name="pool2",   kh=2, kw=2, dh=2, dw=2)
 
-    # # block 3 -- outputs 28x28x256
+    # # block 3 --56*56*256-56*56*256-- outputs 28x28x256
     conv3_1 = conv_op(pool2,    name="conv3_1", kh=3, kw=3, n_out=256, dh=1, dw=1, p=p)
     conv3_2 = conv_op(conv3_1,  name="conv3_2", kh=3, kw=3, n_out=256, dh=1, dw=1, p=p)
     conv3_3 = conv_op(conv3_2,  name="conv3_3", kh=3, kw=3, n_out=256, dh=1, dw=1, p=p)
     pool3 = mpool_op(conv3_3,   name="pool3",   kh=2, kw=2, dh=2, dw=2)
 
-    # block 4 -- outputs 14x14x512
+    # block 4 -- 28*28*512--28*28-512--outputs 14x14x512
     conv4_1 = conv_op(pool3,    name="conv4_1", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     conv4_2 = conv_op(conv4_1,  name="conv4_2", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     conv4_3 = conv_op(conv4_2,  name="conv4_3", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     pool4 = mpool_op(conv4_3,   name="pool4",   kh=2, kw=2, dh=2, dw=2)
 
-    # block 5 -- outputs 7x7x512
+    # block 5 -- 14*14*512--14*14*512--outputs 7x7x512
     conv5_1 = conv_op(pool4,    name="conv5_1", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     conv5_2 = conv_op(conv5_1,  name="conv5_2", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     conv5_3 = conv_op(conv5_2,  name="conv5_3", kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
@@ -103,7 +103,7 @@ def inference_op(input_op, keep_prob):
     #将每个样本化为长度为7x7x512=25088的一维向量
     resh1 = tf.reshape(pool5, [-1, flattened_shape], name="resh1")
 
-    # fully connected
+    # fully connected4096个节点
     fc6 = fc_op(resh1, name="fc6", n_out=4096, p=p)
     fc6_drop = tf.nn.dropout(fc6, keep_prob, name="fc6_drop")
 
@@ -114,9 +114,6 @@ def inference_op(input_op, keep_prob):
     softmax = tf.nn.softmax(fc8)
     predictions = tf.argmax(softmax, 1)
     return predictions, softmax, fc8, p
-
-
-
 
 def time_tensorflow_run(session, target, feed, info_string):
     num_steps_burn_in = 10
@@ -137,8 +134,6 @@ def time_tensorflow_run(session, target, feed, info_string):
     sd = math.sqrt(vr)
     print ('%s: %s across %d steps, %.3f +/- %.3f sec / batch' %
            (datetime.now(), info_string, num_batches, mn, sd))
-
-
 
 def run_benchmark():
     with tf.Graph().as_default():
@@ -166,6 +161,6 @@ def run_benchmark():
         grad = tf.gradients(objective, p)
         time_tensorflow_run(sess, grad, {keep_prob:0.5}, "Forward-backward")
 
-batch_size=32
+batch_size=10
 num_batches=100
 run_benchmark()

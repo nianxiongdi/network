@@ -23,7 +23,7 @@ def print_activations(t):
 #该函数包括多个卷积层和池化层。
 def inference(images):
     parameters = []
-    # 第1个卷积层
+    # 第1个卷积层，卷积核11*11.3通道64个,步长4*4，输入224*224*3，输出55*55*64
     with tf.name_scope('conv1') as scope:
         kernel = tf.Variable(tf.truncated_normal([11, 11, 3, 64], dtype=tf.float32,
                                                  stddev=1e-1), name='weights')
@@ -35,7 +35,7 @@ def inference(images):
         print_activations(conv1)
         parameters += [kernel, biases]
 
-  # 添加LRN层和最大池化层
+  # 添加LRN层（局部响应归一化）和最大池化层（尺寸3*3，步长2）输出27*27*64
     lrn1 = tf.nn.lrn(conv1, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name='lrn1')
     pool1 = tf.nn.max_pool(lrn1,
                            ksize=[1, 3, 3, 1],
@@ -44,7 +44,7 @@ def inference(images):
                            name='pool1')
     print_activations(pool1)
 
-  # 设计第2个卷积层
+  # 设计第2个卷积层，卷积核5*5.通道64.数量192，步长1，p=2，输入27*27*64，输出27*27*192
     with tf.name_scope('conv2') as scope:
         kernel = tf.Variable(tf.truncated_normal([5, 5, 64, 192], dtype=tf.float32,
                                                  stddev=1e-1), name='weights')
@@ -56,7 +56,7 @@ def inference(images):
         parameters += [kernel, biases]
     print_activations(conv2)
 
-  # 对第2个卷积层的输出进行处理，同样也是先做LRN处理再做最大化池处理。
+  # 对第2个卷积层的输出进行处理，同样也是先做LRN处理再做最大化池处理。输出13*13*192
     lrn2 = tf.nn.lrn(conv2, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name='lrn2')
     pool2 = tf.nn.max_pool(lrn2,
                            ksize=[1, 3, 3, 1],
@@ -65,7 +65,7 @@ def inference(images):
                            name='pool2')
     print_activations(pool2)
 
-  # 设计第3个卷积层
+  # 设计第3个卷积层，卷积核3*3，输入通道192，数量384，p=1,输入13*13*192，输出13*13*384
     with tf.name_scope('conv3') as scope:
         kernel = tf.Variable(tf.truncated_normal([3, 3, 192, 384],
                                                  dtype=tf.float32,
@@ -78,7 +78,7 @@ def inference(images):
         parameters += [kernel, biases]
         print_activations(conv3)
 
-  # 设计第4个卷积层
+  # 设计第4个卷积层,13*13*384----13*13*256
     with tf.name_scope('conv4') as scope:
         kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
                                                  dtype=tf.float32,
@@ -91,7 +91,7 @@ def inference(images):
         parameters += [kernel, biases]
         print_activations(conv4)
 
-  # 设计第5个卷积层
+  # 设计第5个卷积层,p=1,13*13*256----13*13*256
     with tf.name_scope('conv5') as scope:
         kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256],
                                                  dtype=tf.float32,
@@ -104,7 +104,7 @@ def inference(images):
         parameters += [kernel, biases]
         print_activations(conv5)
 
-  # 最大池化层
+  # 最大池化层13*13*256----6*6*256
     pool5 = tf.nn.max_pool(conv5,
                            ksize=[1, 3, 3, 1],
                            strides=[1, 2, 2, 1],
@@ -137,7 +137,6 @@ def time_tensorflow_run(session, target, info_string):
 
 #主函数
 def run_benchmark():
-
     with tf.Graph().as_default():
         image_size = 224
         images = tf.Variable(tf.random_normal([batch_size,
@@ -145,11 +144,7 @@ def run_benchmark():
                                            image_size, 3],
                                           dtype=tf.float32,
                                           stddev=1e-1))
-
-
         pool5, parameters = inference(images)
-
-
         init = tf.global_variables_initializer()
 
 
@@ -165,8 +160,11 @@ def run_benchmark():
         objective = tf.nn.l2_loss(pool5)
 
         grad = tf.gradients(objective, parameters)
+
     # Run the backward benchmark.
         time_tensorflow_run(sess, grad, "Forward-backward")
+
+
 
 #执行主函数
 run_benchmark()
